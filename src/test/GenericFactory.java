@@ -1,22 +1,34 @@
 package test;
 
+import java.util.HashMap;
+import java.util.Map;
 
-public class GenericFactory<Product> {
-	
-	private interface Creator<_______>{
-		public _______ create(); // no unhandled exceptions
-	}
-	
-	Map<String,_____________> map;
-	
-	public GenericFactory(){
-		map=new __________<>();
-	}
-	
-	public void insertProduct(String key, Class<__________> c) {
-	}	
-	
-	public Product getNewProduct(String key){
-		return null;
-	}
+public class GenericFactory<V> {
+
+    private interface Creator<V> {
+        public V create(); // no unhandled exceptions
+    }
+
+    Map<String, Creator<V>> map;
+
+    public GenericFactory() {
+        map = new HashMap<>();
+    }
+
+    public void insertProduct(String key, Class<? extends V> c) {
+        Creator<V> creator = () -> {
+            try {
+                return c.newInstance();
+            } catch (Exception e) {
+                return null;
+            }
+        };
+        map.put(key, creator);
+    }
+
+    public V getNewProduct(String key) {
+        if (map.containsKey(key))
+            return map.get(key).create();
+        return null;
+    }
 }
